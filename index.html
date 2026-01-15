@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Recruiting Flags</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h1>Recruiting Flags</h1>
+  <p>Facilitando a busca por pessoas diversas no LinkedIn.</p>
+
+  <input id="q" placeholder="Nome, cargo, localização" />
+  <button onclick="search()">Buscar</button>
+
+  <label>
+    <input type="checkbox" id="onlyFlags" />
+    Mostrar apenas resultados com emojis afirmativos
+  </label>
+
+  <ul id="results"></ul>
+
+  <script>
+    const EMOJIS = /🏳️‍🌈|🏳️‍⚧️|⚧️|✊|🖤|🤎/;
+
+    async function search() {
+      const q = document.getElementById('q').value;
+      const only = document.getElementById('onlyFlags').checked;
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+
+      const list = document.getElementById('results');
+      list.innerHTML = '';
+
+      (data.items || [])
+        .filter(i => !only || EMOJIS.test(i.title + i.snippet))
+        .forEach(i => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="${i.link}" target="_blank">${i.title}</a><br>${i.snippet}`;
+          list.appendChild(li);
+        });
+    }
+  </script>
+</body>
+</html>
