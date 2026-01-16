@@ -1,30 +1,63 @@
+// /api/search — Vercel Serverless Function
+// Required env vars: GOOGLE_API_KEY, GOOGLE_CX
+//
+// Expects POST JSON: { q: string, emojis: string[] }
+//
+// Behavior:
+// - Always searches LinkedIn profiles: site:linkedin.com/in
+// - If emojis array has 1+ items, adds: (emoji1 OR emoji2 OR ...)
+
 export default async function handler(req, res) {
   try {
-    const q = (req.query.q || "").toString().trim();
-    const onlyFlags = (req.query.onlyFlags || "0").toString() === "1";
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST");
+      return res.status(405).json({ error: "Method Not Allowed. Use POST." });
+    }
+
+    const body = req.body || {};
+    const q = (body.q || "").toString().trim();
+    const emojis = Array.isArray(body.emojis) ? body.emojis.map(String).filter(Boolean) : [];
 
     if (!q) return res.status(400).json({ error: "Missing q" });
 
     const key = process.env.GOOGLE_API_KEY;
-    const cx = process.env.GOOGLE_CX;
+    const cx  = process.env.GOOGLE_CX;
 
     if (!key || !cx) {
-      return res.status(500).json({ error: "Missing GOOGLE_API_KEY or GOOGLE_CX" });
+      return res.status(500).json({
+        error: "Missing GOOGLE_API_KEY or GOOGLE_CX in Vercel Environment Variables (Production). Redeploy after adding them."
+      });
     }
 
-    const emojiOr = `(🏳️‍🌈 OR 🏳️‍⚧️ OR ⚧️ OR ✊ OR 🖤 OR 🤎)`;
-    const query = onlyFlags
-      ? `site:linkedin.com/in ${q} ${emojiOr}`
-      : `site:linkedin.com/in ${q}`;
+    // Special handling:
+    // - ✊ should match all tones too, so we expand it server-side.
+    const expanded = [];
+    for (const e of emojis) {
+      if (e === "✊") {
+        expanded.push("✊", "✊🏻", "✊🏼", "✊🏽", "✊🏾", "✊🏿");
+      } else if (e === "⚧️") {
+        // Some renderers drop VS16; include both
+        expanded.push("⚧️", "⚧");
+      } else {
+        expanded.push(e);
+      }
+    }
 
-    const url =
-      `https://www.googleapis.com/customsearch/v1` +
-      `?key=${encodeURIComponent(key)}` +
-      `&cx=${encodeURIComponent(cx)}` +
-      `&q=${encodeURIComponent(query)}` +
-      `&num=10`;
+    const uniqueEmojis = [...new Set(expanded)];
 
-    const r = await fetch(url);
+    const emojiOr = uniqueEmojis.length
+      ? `(${uniqueEmojis.map(e => `${e}`).join(" OR ")})`
+      : "";
+
+    const query = `site:linkedin.com/in ${q} ${emojiOr}`.trim();
+
+    const url = new URL("https://www.googleapis.com/customsearch/v1");
+    url.searchParams.set("key", key);
+    url.searchParams.set("cx", cx);
+    url.searchParams.set("q", query);
+    url.searchParams.set("num", "10");
+
+    const r = await fetch(url.toString());
     const data = await r.json();
 
     if (!r.ok) {
@@ -37,6 +70,7 @@ export default async function handler(req, res) {
       link: it.link || ""
     })).filter(x => x.link);
 
+    res.setHeader("Cache-Control", "no-store");
     return res.status(200).json({ items });
   } catch (e) {
     return res.status(500).json({ error: e?.message || "Search failed" });
