@@ -191,7 +191,7 @@
         <div class="logo">🏳️‍🌈</div>
         <div>
           <div style="font-size:16px;">Recruiting Flags</div>
-          <div style="font-size:12px; color:var(--muted); font-weight:700;">Busca perfis do LinkedIn via Google + filtro por emojis selecionáveis</div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700;">Google → LinkedIn com filtro por emojis selecionáveis</div>
         </div>
       </div>
       <div class="pill">MVP · Vercel + Google Custom Search</div>
@@ -201,13 +201,13 @@
       <div class="card">
         <h1>Facilitar a busca também é incluir.</h1>
         <p>
-          Pessoas usam bandeiras e símbolos no nome como afirmação. O Recruiting Flags tenta reduzir fricção:
-          você busca por nome/cargo e, opcionalmente, pede ao Google para priorizar resultados que contenham
-          os emojis afirmativos selecionados.
+          Pessoas usam bandeiras e símbolos no nome como afirmação. Aqui você busca por cargo/nome/local e pode
+          selecionar quais emojis afirmativos devem entrar no filtro.
         </p>
         <div class="mini">
-          <b>Importante:</b> o filtro depende do Google conseguir “ver” esses emojis no conteúdo indexado do perfil.
-          Não cobre 100% dos casos, mas é bem mais efetivo do que filtrar apenas o snippet no front.
+          <b>Como o filtro funciona aqui:</b> nós pedimos ao Google para priorizar páginas que contenham os emojis selecionados
+          e depois aplicamos um <b>pós-filtro estrito</b> mantendo apenas resultados cujo <b>título</b> contenha o emoji
+          (isso é a melhor aproximação “emoji no nome” sem rodar dentro do LinkedIn).
         </div>
       </div>
 
@@ -217,7 +217,7 @@
         <div class="grid">
           <div>
             <label for="qRole">Cargo / habilidade</label>
-            <input id="qRole" placeholder='Ex.: "Product Designer", "Copywriter", "Data Analyst"' />
+            <input id="qRole" placeholder='Ex.: "Creative Director", "Product Designer", "Data Analyst"' />
           </div>
           <div>
             <label for="qLocation">Local (opcional)</label>
@@ -240,8 +240,7 @@
           <button class="secondary" id="btnTest">Testar /api/search</button>
         </div>
 
-        <div class="sectionTitle">Filtro por emojis afirmativos</div>
-
+        <div class="sectionTitle">Escolha os emojis afirmativos</div>
         <div class="emojiGrid" id="emojiGrid"></div>
 
         <div class="actions" style="margin-top:10px;">
@@ -250,7 +249,7 @@
         </div>
 
         <div class="note">
-          Dica: você pode selecionar mais de um emoji. O filtro só é aplicado se pelo menos 1 estiver marcado.
+          Se nenhum emoji estiver selecionado, a busca roda <b>sem filtro</b>.
         </div>
 
         <div class="status" id="status"></div>
@@ -271,11 +270,11 @@
   </div>
 
   <script>
-    // Emojis disponíveis (você pode adicionar/remover aqui)
+    // Emojis disponíveis (adicione/remova à vontade)
     const EMOJI_OPTIONS = [
       { key: "rainbow", emoji: "🏳️‍🌈", label: "Bandeira LGBTQIA+", hint: "orgulho / diversidade" },
       { key: "trans",   emoji: "🏳️‍⚧️", label: "Bandeira Trans",    hint: "visibilidade trans" },
-      { key: "symbol",  emoji: "⚧️",    label: "Símbolo trans",     hint: "símbolo (variações)" },
+      { key: "symbol",  emoji: "⚧️",    label: "Símbolo trans",     hint: "inclui variação ⚧" },
       { key: "fist",    emoji: "✊",     label: "Punho (todos tons)",hint: "inclui ✊🏻✊🏼✊🏽✊🏾✊🏿" },
       { key: "black",   emoji: "🖤",     label: "Coração preto",    hint: "afirmação / apoio" },
       { key: "brown",   emoji: "🤎",     label: "Coração marrom",   hint: "afirmação / apoio" },
@@ -292,13 +291,11 @@
       statusEl.style.display = "block";
       statusEl.textContent = msg;
     }
-
     function clearStatus(){
       statusEl.style.display = "none";
       statusEl.textContent = "";
       statusEl.className = "status";
     }
-
     function escapeHtml(s){
       return (s||"")
         .replaceAll("&","&amp;")
@@ -331,6 +328,22 @@
       return selected;
     }
 
+    // Expand server-side rules also mirrored client-side for strict title filtering
+    function expandSelectedEmojis(emojis){
+      const out = [];
+      for (const e of emojis) {
+        if (e === "✊") out.push("✊","✊🏻","✊🏼","✊🏽","✊🏾","✊🏿");
+        else if (e === "⚧️") out.push("⚧️","⚧");
+        else out.push(e);
+      }
+      return [...new Set(out)];
+    }
+
+    function titleHasAnyEmoji(title, expandedEmojis){
+      const t = title || "";
+      return expandedEmojis.some(e => t.includes(e));
+    }
+
     function renderEmojiOptions(){
       emojiGrid.innerHTML = EMOJI_OPTIONS.map(opt => `
         <label class="emojiOpt">
@@ -357,7 +370,7 @@
 
     async function callSearch({ test=false } = {}){
       const q = buildKeywords();
-      const emojis = getSelectedEmojis();
+      const selected = getSelectedEmojis();
 
       if (!test && !q){
         setStatus("Escreva pelo menos um cargo/habilidade (ou algum termo) para buscar.", "warn");
@@ -370,19 +383,13 @@
 
       const effectiveQ = test ? "Product Designer São Paulo UX" : q;
 
-      // Só aplica filtro se houver pelo menos 1 emoji selecionado
-      const payload = {
-        q: effectiveQ,
-        emojis: emojis
-      };
-
       setStatus("Buscando…");
 
       try{
         const res = await fetch("/api/search", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ q: effectiveQ, emojis: selected })
         });
 
         const text = await res.text();
@@ -396,13 +403,23 @@
           return;
         }
 
-        const items = data?.items || [];
-        setStatus(`✅ OK\nResultados recebidos: ${items.length}\nEmojis na query: ${emojis.length ? emojis.join(" ") : "(nenhum — sem filtro)"}`);
+        let items = data?.items || [];
+
+        // STRICT MODE: if emojis selected, keep only results whose TITLE includes one of them
+        const expanded = expandSelectedEmojis(selected);
+        if (expanded.length) {
+          items = items.filter(it => titleHasAnyEmoji(it.title, expanded));
+        }
+
+        setStatus(
+          `✅ OK\nResultados recebidos (após filtro estrito): ${items.length}\nEmojis selecionados: ${expanded.length ? expanded.join(" ") : "(nenhum — sem filtro)"}`
+        );
+
         renderResults(items);
 
         if (!items.length){
           setStatus(
-            "Nenhum resultado.\n\nDicas:\n- tente termos mais simples (cargo + cidade)\n- se o filtro estiver ativo, experimente reduzir ou desmarcar alguns emojis\n- o Google pode não indexar emojis em todos os perfis",
+            "Nenhum resultado após o filtro estrito (emoji no título).\n\nDicas:\n- tente termos mais simples (cargo + cidade)\n- selecione 1 emoji por vez para testar\n- o Google pode não indexar emojis no título de todos os perfis\n- desmarque todos os emojis para ver resultados sem filtro",
             "warn"
           );
         }
@@ -413,9 +430,10 @@
       }
     }
 
-    // Events
+    // Init
     renderEmojiOptions();
 
+    // Events
     $("btnSearch").addEventListener("click", () => callSearch({ test:false }));
     $("btnTest").addEventListener("click",  () => callSearch({ test:true  }));
 
