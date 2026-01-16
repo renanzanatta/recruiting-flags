@@ -1,24 +1,13 @@
-<script>
-  const EMOJIS = /🏳️‍🌈|🏳️‍⚧️|⚧️|✊|🖤|🤎/;
-
-  async function search() {
-    const q = document.getElementById('q').value.trim();
-    const only = document.getElementById('onlyFlags').checked;
-
-    if (!q) return;
-
-    const url = `/api/search?q=${encodeURIComponent(q)}&onlyFlags=${only ? "1" : "0"}`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const list = document.getElementById('results');
-    list.innerHTML = '';
-
-    (data.items || [])
-      .forEach(i => {
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="${i.link}" target="_blank">${i.title}</a><br>${i.snippet || ""}`;
-        list.appendChild(li);
-      });
-  }
-</script>
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recruiting Flags</title>
+</head>
+<body style="font-family: system-ui; padding: 24px;">
+  <h1>Recruiting Flags</h1>
+  <p>Se você está vendo isso, o front está OK ✅</p>
+  <p>Teste do backend: <a href="/api/search?q=creative%20director" target="_blank">/api/search</a></p>
+</body>
+</html>
