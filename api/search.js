@@ -1,12 +1,3 @@
-// /api/search — Vercel Serverless Function
-// Required env vars: GOOGLE_API_KEY, GOOGLE_CX
-//
-// Expects POST JSON: { q: string, emojis: string[] }
-//
-// Behavior:
-// - Always searches LinkedIn profiles: site:linkedin.com/in
-// - If emojis array has 1+ items, adds: (emoji1 OR emoji2 OR ...)
-
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
@@ -15,10 +6,16 @@ export default async function handler(req, res) {
     }
 
     const body = req.body || {};
-    const q = (body.q || "").toString().trim();
+
+    const role = (body.role || "").toString().trim();
+    const location = (body.location || "").toString().trim();
+    const name = (body.name || "").toString().trim();
+    const extra = (body.extra || "").toString().trim();
     const emojis = Array.isArray(body.emojis) ? body.emojis.map(String).filter(Boolean) : [];
 
-    if (!q) return res.status(400).json({ error: "Missing q" });
+    if (!(role || location || name || extra)) {
+      return res.status(400).json({ error: "Missing query. Provide role/location/name/extra." });
+    }
 
     const key = process.env.GOOGLE_API_KEY;
     const cx  = process.env.GOOGLE_CX;
@@ -29,30 +26,48 @@ export default async function handler(req, res) {
       });
     }
 
-    // Expand a few emoji variants to improve matching
+    // Expand some variants
     const expanded = [];
     for (const e of emojis) {
-      if (e === "✊") {
-        expanded.push("✊", "✊🏻", "✊🏼", "✊🏽", "✊🏾", "✊🏿");
-      } else if (e === "⚧️") {
-        expanded.push("⚧️", "⚧"); // some renderers drop VS16
-      } else {
-        expanded.push(e);
-      }
+      if (e === "✊") expanded.push("✊", "✊🏻", "✊🏼", "✊🏽", "✊🏾", "✊🏿");
+      else if (e === "⚧️") expanded.push("⚧️", "⚧");
+      else expanded.push(e);
     }
     const uniqueEmojis = [...new Set(expanded)];
+    const emojiOr = uniqueEmojis.length ? `(${uniqueEmojis.join(" OR ")})` : "";
 
-    const emojiOr = uniqueEmojis.length
-      ? `(${uniqueEmojis.join(" OR ")})`
-      : "";
+    // Profile scope: in + pub + br
+    const profileScope = `(site:linkedin.com/in OR site:linkedin.com/pub OR site:br.linkedin.com/in)`;
 
-    const query = `site:linkedin.com/in ${q} ${emojiOr}`.trim();
+    // Build query parts
+    const parts = [profileScope];
+
+    // Name: enforce exact phrase + intitle (precision)
+    if (name) {
+      const quotedName = `"${name.replaceAll('"', '')}"`;
+      parts.push(quotedName);
+      parts.push(`intitle:${quotedName}`);
+    }
+
+    // Role / extra / location: less strict
+    if (role) parts.push(role);
+    if (extra) parts.push(extra);
+    if (location) parts.push(`"${location.replaceAll('"', '')}"`);
+
+    if (emojiOr) parts.push(emojiOr);
+
+    const query = parts.join(" ").trim();
 
     const url = new URL("https://www.googleapis.com/customsearch/v1");
     url.searchParams.set("key", key);
     url.searchParams.set("cx", cx);
     url.searchParams.set("q", query);
     url.searchParams.set("num", "10");
+
+    // Make it closer to your Google experience
+    url.searchParams.set("hl", "pt");
+    url.searchParams.set("gl", "br");
+    url.searchParams.set("safe", "off");
 
     const r = await fetch(url.toString());
     const data = await r.json();
@@ -68,7 +83,7 @@ export default async function handler(req, res) {
     })).filter(x => x.link);
 
     res.setHeader("Cache-Control", "no-store");
-    return res.status(200).json({ items });
+    return res.status(200).json({ items, debugQuery: query });
   } catch (e) {
     return res.status(500).json({ error: e?.message || "Search failed" });
   }
