@@ -22,3 +22,306 @@
     }
     .wrap{max-width:1120px; margin:0 auto; padding:42px 18px 70px;}
     header{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.2px;}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:linear-gradient(135deg, rgba(96,165,250,.95), rgba(52,211,153,.95));
+      box-shadow:0 12px 34px rgba(96,165,250,.14);
+      display:grid;place-items:center;font-size:22px;
+    }
+    .pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px;background:rgba(255,255,255,.03);}
+    .hero{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px; align-items:start;}
+    @media (max-width: 940px){.hero{grid-template-columns:1fr;}}
+    .card{background: var(--panel); border:1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding:22px; backdrop-filter: blur(10px);}
+    h1{margin:0 0 10px; font-size:40px; line-height:1.05;}
+    @media (max-width: 520px){ h1{font-size:34px;} }
+    p{margin:0 0 12px; color:var(--muted); font-size:16px; line-height:1.55;}
+    .mini{color:var(--muted); font-size:13px; line-height:1.45; border-top:1px solid var(--line); padding-top:12px; margin-top:14px;}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+    @media (max-width: 640px){ .grid{grid-template-columns:1fr;} }
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px;}
+    input{
+      width:100%; padding:12px 12px; border-radius: 12px; border:1px solid var(--line);
+      background: rgba(255,255,255,.04); color:var(--text); outline:none;
+    }
+    input::placeholder{color: rgba(233,238,251,.45);}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+    button{border:0; border-radius: 12px; padding:12px 14px; font-weight:900; cursor:pointer; color:#06101f; background: linear-gradient(135deg, var(--brand1), var(--brand2));}
+    button.secondary{color: var(--text); background: rgba(255,255,255,.06); border:1px solid var(--line);}
+    .sectionTitle{margin:14px 0 10px; padding-top:14px; border-top:1px solid var(--line); color: rgba(233,238,251,.9); font-weight:900; font-size:13px; letter-spacing:.2px; text-transform:uppercase;}
+    .emojiGrid{display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px;}
+    @media (max-width: 520px){ .emojiGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .emojiOpt{display:flex; gap:10px; align-items:flex-start; padding:10px 10px; border-radius:14px; border:1px solid var(--line); background: rgba(255,255,255,.03); cursor:pointer; user-select:none;}
+    .emojiOpt input{ margin-top:3px; accent-color:#34d399; }
+    .emojiBig{ font-size:20px; line-height:1; width:28px; }
+    .emojiMeta{ display:flex; flex-direction:column; gap:2px; }
+    .emojiName{ font-weight:900; font-size:13px; color: rgba(233,238,251,.92); }
+    .emojiHint{ font-size:12px; color: var(--muted); line-height:1.35; }
+    .note{margin-top:10px; color: var(--muted); font-size:12px; line-height:1.45;}
+    .status{display:none; margin-top:12px; padding:10px 12px; border-radius: 12px; border:1px solid var(--line); background: rgba(0,0,0,.22); color: rgba(233,238,251,.85); font-size:13px; line-height:1.45; white-space:pre-wrap;}
+    .status.warn{ border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95); }
+    .status.err{ border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95); }
+    .resultsHeader{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:13px;}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background: rgba(0,0,0,.18); color: rgba(233,238,251,.8); font-size:12px; white-space:nowrap;}
+    .results{margin-top:12px; display:grid; gap:10px;}
+    .result{border:1px solid var(--line); background: rgba(255,255,255,.03); border-radius: 14px; padding:12px 12px;}
+    .result a{color: var(--text); font-weight:900; text-decoration:none;}
+    .result a:hover{ text-decoration:underline; }
+    .snippet{margin-top:6px; color:var(--muted); font-size:13px; line-height:1.45;}
+    .url{margin-top:8px; font-size:12px; color: rgba(169,179,199,.75); word-break: break-all;}
+    footer{margin-top:24px; color: rgba(169,179,199,.75); font-size:12px; line-height:1.5; text-align:center;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">🏳️‍🌈</div>
+        <div>
+          <div style="font-size:16px;">Recruiting Flags</div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700;">Busca perfis do LinkedIn via Google + filtro por emojis</div>
+        </div>
+      </div>
+      <div class="pill">MVP · Vercel + Google Custom Search</div>
+    </header>
+
+    <section class="hero">
+      <div class="card">
+        <h1>Facilitar a busca também é incluir.</h1>
+        <p>
+          Use cargo/nome/local para encontrar perfis. Selecione os emojis que você quer usar como sinalizador
+          e a busca tentará priorizar perfis que os exibem no nome.
+        </p>
+        <div class="mini">
+          <b>Como buscamos com precisão:</b> quando você preenche <b>Nome</b>, nós tratamos como frase exata (aspas)
+          e usamos <b>intitle</b> para aproximar “emoji no nome”. Isso reduz resultados “nada a ver”.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 12px; font-size:18px;">Buscar</h2>
+
+        <div class="grid">
+          <div>
+            <label for="qRole">Cargo / habilidade</label>
+            <input id="qRole" placeholder='Ex.: "Creative Director", "Product Designer", "Data Analyst"' />
+          </div>
+          <div>
+            <label for="qLocation">Local (opcional)</label>
+            <input id="qLocation" placeholder='Ex.: São Paulo, Brasil' />
+          </div>
+          <div>
+            <label for="qName">Nome (opcional, exato)</label>
+            <input id="qName" placeholder='Ex.: Clarissa Astigarraga' />
+          </div>
+          <div>
+            <label for="qExtra">Palavras-chave (opcional)</label>
+            <input id="qExtra" placeholder='Ex.: portfólio, UX, SQL, liderança' />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btnSearch">Buscar</button>
+          <button class="secondary" id="btnDemo">Exemplo</button>
+          <button class="secondary" id="btnClear">Limpar</button>
+          <button class="secondary" id="btnTest">Testar /api/search</button>
+        </div>
+
+        <div class="sectionTitle">Escolha os emojis afirmativos</div>
+        <div class="emojiGrid" id="emojiGrid"></div>
+
+        <div class="actions" style="margin-top:10px;">
+          <button class="secondary" id="btnSelectAll">Selecionar todos</button>
+          <button class="secondary" id="btnSelectNone">Limpar seleção</button>
+        </div>
+
+        <div class="note">
+          Se nenhum emoji estiver selecionado, a busca roda <b>sem filtro</b>.
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="resultsHeader">
+          <div>Resultados</div>
+          <div class="badge" id="countBadge">0</div>
+        </div>
+        <div class="results" id="results"></div>
+
+        <div class="note" style="margin-top:12px;">
+          Este MVP exibe links retornados pelo Google. Não coletamos dados do LinkedIn.
+        </div>
+      </div>
+    </section>
+
+    <footer>Recruiting Flags · MVP para teste</footer>
+  </div>
+
+  <script>
+    const EMOJI_OPTIONS = [
+      { key: "rainbow", emoji: "🏳️‍🌈", label: "Bandeira LGBTQIA+", hint: "orgulho / diversidade" },
+      { key: "trans",   emoji: "🏳️‍⚧️", label: "Bandeira Trans",    hint: "visibilidade trans" },
+      { key: "symbol",  emoji: "⚧️",    label: "Símbolo trans",     hint: "inclui variação ⚧" },
+      { key: "fist",    emoji: "✊",     label: "Punho (todos tons)",hint: "inclui ✊🏻✊🏼✊🏽✊🏾✊🏿" },
+      { key: "black",   emoji: "🖤",     label: "Coração preto",    hint: "afirmação / apoio" },
+      { key: "brown",   emoji: "🤎",     label: "Coração marrom",   hint: "afirmação / apoio" },
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const statusEl = $("status");
+    const resultsEl = $("results");
+    const countBadge = $("countBadge");
+    const emojiGrid = $("emojiGrid");
+
+    function setStatus(msg, type=""){
+      statusEl.className = "status" + (type ? (" " + type) : "");
+      statusEl.style.display = "block";
+      statusEl.textContent = msg;
+    }
+    function clearStatus(){
+      statusEl.style.display = "none";
+      statusEl.textContent = "";
+      statusEl.className = "status";
+    }
+    function escapeHtml(s){
+      return (s||"")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;");
+    }
+
+    function getSelectedEmojis(){
+      const selected = [];
+      EMOJI_OPTIONS.forEach(opt => {
+        const cb = document.querySelector(`input[data-emoji-key="${opt.key}"]`);
+        if (cb && cb.checked) selected.push(opt.emoji);
+      });
+      return selected;
+    }
+
+    function renderEmojiOptions(){
+      emojiGrid.innerHTML = EMOJI_OPTIONS.map(opt => `
+        <label class="emojiOpt">
+          <input type="checkbox" data-emoji-key="${opt.key}" checked />
+          <div class="emojiBig">${opt.emoji}</div>
+          <div class="emojiMeta">
+            <div class="emojiName">${escapeHtml(opt.label)}</div>
+            <div class="emojiHint">${escapeHtml(opt.hint)}</div>
+          </div>
+        </label>
+      `).join("");
+    }
+
+    function renderResults(items){
+      countBadge.textContent = String(items.length);
+      resultsEl.innerHTML = items.map(it => `
+        <div class="result">
+          <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.title || it.link)}</a>
+          ${it.snippet ? `<div class="snippet">${escapeHtml(it.snippet)}</div>` : ""}
+          <div class="url">${escapeHtml(it.link)}</div>
+        </div>
+      `).join("");
+    }
+
+    async function callSearch({ test=false } = {}){
+      const role = $("qRole").value.trim();
+      const loc  = $("qLocation").value.trim();
+      const name = $("qName").value.trim();
+      const extra= $("qExtra").value.trim();
+      const emojis = getSelectedEmojis();
+
+      if (!test && !(role || loc || name || extra)) {
+        setStatus("Preencha pelo menos um campo para buscar.", "warn");
+        return;
+      }
+
+      clearStatus();
+      renderResults([]);
+      countBadge.textContent = "…";
+      setStatus("Buscando…");
+
+      const payload = test
+        ? { role: "Creative Director", location: "São Paulo", name: "Clarissa Astigarraga", extra: "iDTBWA", emojis }
+        : { role, location: loc, name, extra, emojis };
+
+      try{
+        const res = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = null; }
+
+        if (!res.ok){
+          setStatus("Erro do endpoint (" + res.status + "):\n\n" + (data?.error || text), "err");
+          renderResults([]);
+          countBadge.textContent = "0";
+          return;
+        }
+
+        const items = data?.items || [];
+        setStatus(`✅ OK\nResultados: ${items.length}\nEmojis selecionados: ${emojis.length ? emojis.join(" ") : "(nenhum — sem filtro)"}`);
+        renderResults(items);
+
+        if (!items.length){
+          setStatus(
+            "Nenhum resultado.\n\nDicas:\n- se você preencheu Nome, tente apenas Nome (sem cargo)\n- tente remover local/extra para reduzir restrição\n- selecione 1 emoji por vez\n- desmarque todos os emojis para ver resultados sem filtro",
+            "warn"
+          );
+        }
+      }catch(e){
+        setStatus("Erro ao chamar /api/search:\n\n" + (e?.message || e), "err");
+        renderResults([]);
+        countBadge.textContent = "0";
+      }
+    }
+
+    // Init
+    renderEmojiOptions();
+
+    $("btnSearch").addEventListener("click", () => callSearch({ test:false }));
+    $("btnTest").addEventListener("click",  () => callSearch({ test:true  }));
+
+    $("btnDemo").addEventListener("click", () => {
+      $("qRole").value = "Creative Director";
+      $("qLocation").value = "São Paulo";
+      $("qName").value = "Clarissa Astigarraga";
+      $("qExtra").value = "iDTBWA";
+      setStatus("Exemplo preenchido. Clique em Buscar.", "warn");
+    });
+
+    $("btnClear").addEventListener("click", () => {
+      $("qRole").value = "";
+      $("qLocation").value = "";
+      $("qName").value = "";
+      $("qExtra").value = "";
+      clearStatus();
+      renderResults([]);
+      countBadge.textContent = "0";
+    });
+
+    $("btnSelectAll").addEventListener("click", () => {
+      EMOJI_OPTIONS.forEach(opt => {
+        const cb = document.querySelector(`input[data-emoji-key="${opt.key}"]`);
+        if (cb) cb.checked = true;
+      });
+      setStatus("Todos os emojis selecionados.", "warn");
+    });
+
+    $("btnSelectNone").addEventListener("click", () => {
+      EMOJI_OPTIONS.forEach(opt => {
+        const cb = document.querySelector(`input[data-emoji-key="${opt.key}"]`);
+        if (cb) cb.checked = false;
+      });
+      setStatus("Seleção limpa. (Sem emojis = sem filtro)", "warn");
+    });
+
+    ["qRole","qLocation","qName","qExtra"].forEach(id=>{
+      $(id).addEventListener("keydown", (e)=>{ if(e.key==="Enter") callSearch({test:false}); });
+    });
+  </script>
+</body>
+</html>
