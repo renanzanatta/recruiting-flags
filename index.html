@@ -96,7 +96,6 @@
     .result a:hover{ text-decoration:underline; }
     .snippet{margin-top:6px; color:var(--muted); font-size:13px; line-height:1.45;}
     .url{margin-top:8px; font-size:12px; color: rgba(169,179,199,.75); word-break: break-all;}
-
     code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
   </style>
 </head>
@@ -107,7 +106,7 @@
         <div class="logo">🏳️‍🌈</div>
         <div>
           <div style="font-size:16px;">Recruiting Flags</div>
-          <div style="font-size:12px; color:var(--muted); font-weight:700;">Debug: ver payload + received + debugQuery</div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700;">Filtro por NOME (TITLE) + Emojis (TITLE)</div>
         </div>
       </div>
       <div class="pill">MVP · Vercel + Google CSE</div>
@@ -115,16 +114,16 @@
 
     <section class="hero">
       <div class="card">
-        <h1>Emoji só no nome.</h1>
+        <h1>Busca mais “sã”.</h1>
         <p>
-          Aqui a regra é rígida: se o emoji não estiver no <b>TÍTULO</b> do resultado, ele não aparece.
-          Isso elimina os casos em que a bandeira está só na descrição.
+          O Google CSE às vezes devolve perfis “relacionados” mesmo quando você digita um nome exato.
+          Então, além do filtro de emoji, a gente faz um <b>pós-filtro por nome no TÍTULO</b>.
         </p>
         <div class="mini">
-          <b>Debug:</b> ao buscar, mostramos:
-          <br>• <code>payload</code> enviado
-          <br>• <code>received</code> que o backend realmente recebeu
-          <br>• <code>debugQuery</code> montada
+          <b>Regras:</b>
+          <br>• Se <b>Nome</b> foi preenchido → só mostra resultado cujo <b>TÍTULO</b> contenha esse nome (ou as palavras do nome).
+          <br>• Se emojis foram selecionados → só mostra resultado cujo <b>TÍTULO</b> contenha algum emoji selecionado.
+          <br>• Remove páginas genéricas (ex.: “20300+ perfis…”).
         </div>
       </div>
 
@@ -146,7 +145,7 @@
           </div>
           <div>
             <label for="qExtra">Palavras-chave (opcional)</label>
-            <input id="qExtra" placeholder='Ex.: portfólio, UX' />
+            <input id="qExtra" placeholder='Ex.: iDTBWA, portfólio, UX' />
           </div>
         </div>
 
@@ -167,7 +166,7 @@
         <div class="status" id="status"></div>
 
         <div class="resultsHeader">
-          <div>Resultados (após filtro no TITLE)</div>
+          <div>Resultados (após filtros)</div>
           <div class="badge" id="countBadge">0</div>
         </div>
         <div class="results" id="results"></div>
@@ -233,6 +232,34 @@
       return expandedEmojis.some(e => t.includes(e));
     }
 
+    // Remove resultados genéricos que não são perfis (ex.: "20300+ perfis com ...")
+    function isGenericNonProfileResult(item){
+      const t = (item.title || "").toLowerCase();
+      // regras simples que pegam esses “cards” genéricos do LinkedIn
+      if (t.includes("perfis com")) return true;
+      if (t.includes("profiles with")) return true;
+      if (t.includes("resultados para")) return true;
+      if (t.includes("search results")) return true;
+      return false;
+    }
+
+    // Pós-filtro por nome no TITLE:
+    // - Se o usuário digitou nome completo, a gente aceita se o TITLE contém o nome completo
+    // - Se não contém o nome completo, aceita se contém TODAS as palavras do nome (>= 2 letras)
+    function titleMatchesName(title, name){
+      if (!name)z return true;
+      const t = (title || "").toLowerCase();
+      const n = name.toLowerCase().trim();
+
+      if (!n) return true;
+      if (t.includes(n)) return true;
+
+      const parts = n.split(/\s+/).filter(p => p.length >= 2);
+      if (parts.length === 0) return true;
+
+      return parts.every(p => t.includes(p));
+    }
+
     function renderEmojiOptions(){
       emojiGrid.innerHTML = EMOJI_OPTIONS.map(opt => `
         <label class="emojiOpt">
@@ -278,7 +305,7 @@
       }
 
       const payload = test
-        ? { role: "Creative Director", location: "São Paulo", name: "Clarissa Astigarraga", extra: "creative director", emojis: selected }
+        ? { role: "Creative Director", location: "São Paulo", name: "Clarissa Astigarraga", extra: "iDTBWA", emojis: selected }
         : { role, location, name, extra, emojis: selected };
 
       clearStatus();
@@ -311,8 +338,7 @@
         setStatus(
           "Erro do endpoint (" + res.status + "):\n\n" +
           (data?.error || "Erro desconhecido") +
-          "\n\nDebugQuery:\n" + (data?.debugQuery || "(sem)") +
-          "\n\nReceived:\n" + JSON.stringify(data?.received || {}, null, 2),
+          "\n\nDebugQuery:\n" + (data?.debugQuery || "(sem)"),
           "err"
         );
         renderResults([]);
@@ -320,50 +346,50 @@
         return;
       }
 
-      let items = data.items || [];
+      const rawItems = data.items || [];
+      let items = rawItems.slice();
 
-      // Filtro estrito: emoji precisa estar no TITLE
+      // 1) remove genéricos
+      items = items.filter(it => !isGenericNonProfileResult(it));
+
+      // 2) se nome foi preenchido, filtra por nome no TITLE
+      if (name) {
+        items = items.filter(it => titleMatchesName(it.title, name));
+      }
+
+      // 3) se emojis foram selecionados, filtra por emoji no TITLE
       if (expanded.length) {
         items = items.filter(it => titleHasAnyEmoji(it.title, expanded));
       }
 
-      // Debug completo na tela (pra você confirmar o bug do "nome não indo")
       setStatus(
         `✅ OK
 
-PAYLOAD ENVIADO (front):
-${JSON.stringify(payload, null, 2)}
+Recebidos (Google CSE): ${rawItems.length}
+Após remover genéricos: ${rawItems.filter(it=>!isGenericNonProfileResult(it)).length}
+Após filtro por nome (TITLE): ${name ? items.length : "(nome vazio — ignorado)"}
+Após filtro por emoji (TITLE): ${expanded.length ? items.length : "(sem emojis — ignorado)"}
 
-RECEBIDO PELO BACKEND:
-${JSON.stringify(data.received || {}, null, 2)}
+Nome: ${name || "(vazio)"}
+Emojis: ${expanded.length ? expanded.join(" ") : "(nenhum — sem filtro)"}
 
-DEBUGQUERY:
-${data.debugQuery || ""}
-
-RECEBIDOS: ${(data.items||[]).length}
-APÓS FILTRO NO TITLE: ${items.length}
-
-EMOJIS (expandidos):
-${expanded.length ? expanded.join(" ") : "(nenhum — sem filtro)"}`
+DebugQuery:
+${data.debugQuery || ""}`
       );
 
       renderResults(items);
 
       if (!items.length) {
         setStatus(
-          `Nenhum resultado após filtro no TITLE.
+          `Nenhum resultado após filtros.
 
-PAYLOAD ENVIADO (front):
-${JSON.stringify(payload, null, 2)}
+Dicas:
+- se você preencheu Nome, tente apenas Nome (sem cargo/extra/local)
+- desmarque emojis para validar se o nome aparece sem filtro
+- o CSE pode não trazer emojis no título, mesmo existindo no nome do LinkedIn
 
-RECEBIDO PELO BACKEND:
-${JSON.stringify(data.received || {}, null, 2)}
-
-DEBUGQUERY:
-${data.debugQuery || ""}
-
-Dica: se RECEBIDO.name estiver vazio, o problema é o front (campo não está indo).
-Se RECEBIDO.name estiver certo, o problema é o Google CSE não retornando esse perfil.`,
+DebugQuery:
+${data.debugQuery || ""}`,
           "warn"
         );
       }
@@ -400,7 +426,6 @@ Se RECEBIDO.name estiver certo, o problema é o Google CSE não retornando esse 
       setStatus("Seleção limpa. (Sem emojis = sem filtro)", "warn");
     });
 
-    // Enter para buscar
     ["qRole","qLocation","qName","qExtra"].forEach(id=>{
       $(id).addEventListener("keydown", (e)=>{ if(e.key==="Enter") callSearch({test:false}); });
     });
