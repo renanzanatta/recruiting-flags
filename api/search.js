@@ -29,24 +29,21 @@ export default async function handler(req, res) {
       });
     }
 
-    // Special handling:
-    // - ✊ should match all tones too, so we expand it server-side.
+    // Expand a few emoji variants to improve matching
     const expanded = [];
     for (const e of emojis) {
       if (e === "✊") {
         expanded.push("✊", "✊🏻", "✊🏼", "✊🏽", "✊🏾", "✊🏿");
       } else if (e === "⚧️") {
-        // Some renderers drop VS16; include both
-        expanded.push("⚧️", "⚧");
+        expanded.push("⚧️", "⚧"); // some renderers drop VS16
       } else {
         expanded.push(e);
       }
     }
-
     const uniqueEmojis = [...new Set(expanded)];
 
     const emojiOr = uniqueEmojis.length
-      ? `(${uniqueEmojis.map(e => `${e}`).join(" OR ")})`
+      ? `(${uniqueEmojis.join(" OR ")})`
       : "";
 
     const query = `site:linkedin.com/in ${q} ${emojiOr}`.trim();
