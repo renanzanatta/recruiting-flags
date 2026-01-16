@@ -8,7 +8,7 @@
     :root{
       --bg:#0b1220; --panel:rgba(17,26,46,.86); --text:#e9eefb; --muted:#a9b3c7;
       --line:rgba(255,255,255,.10); --shadow:0 18px 50px rgba(0,0,0,.35); --radius:18px;
-      --brand1:#60a5fa; --brand2:#34d399; --warn:#fbbf24; --danger:#fb7185;
+      --brand1:#60a5fa; --brand2:#34d399;
     }
     *{box-sizing:border-box}
     body{
@@ -22,44 +22,57 @@
     }
     .wrap{max-width:1120px; margin:0 auto; padding:42px 18px 70px;}
     header{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
-    .brand{display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.2px;}
-    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg, rgba(96,165,250,.95), rgba(52,211,153,.95));
-      box-shadow:0 12px 34px rgba(96,165,250,.14);display:grid;place-items:center;font-size:22px;}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:900;}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:linear-gradient(135deg, rgba(96,165,250,.95), rgba(52,211,153,.95));
+      box-shadow:0 12px 34px rgba(96,165,250,.14);
+      display:grid;place-items:center;font-size:22px;
+    }
     .pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px;background:rgba(255,255,255,.03);}
     .hero{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px; align-items:start;}
     @media (max-width: 940px){.hero{grid-template-columns:1fr;}}
-    .card{background: var(--panel); border:1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding:22px; backdrop-filter: blur(10px);}
+    .card{
+      background: var(--panel);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:22px;
+      backdrop-filter: blur(10px);
+    }
     h1{margin:0 0 10px; font-size:40px; line-height:1.05;}
-    @media (max-width: 520px){ h1{font-size:34px;} }
     p{margin:0 0 12px; color:var(--muted); font-size:16px; line-height:1.55;}
-    .mini{color:var(--muted); font-size:13px; line-height:1.45; border-top:1px solid var(--line); padding-top:12px; margin-top:14px;}
     .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
     @media (max-width: 640px){ .grid{grid-template-columns:1fr;} }
     label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px;}
-    input{width:100%; padding:12px 12px; border-radius: 12px; border:1px solid var(--line); background: rgba(255,255,255,.04); color:var(--text); outline:none;}
-    input::placeholder{color: rgba(233,238,251,.45);}
+    input{
+      width:100%; padding:12px 12px; border-radius: 12px; border:1px solid var(--line);
+      background: rgba(255,255,255,.04); color:var(--text); outline:none;
+    }
     .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
-    button{border:0; border-radius: 12px; padding:12px 14px; font-weight:900; cursor:pointer; color:#06101f; background: linear-gradient(135deg, var(--brand1), var(--brand2));}
+    button{
+      border:0; border-radius: 12px; padding:12px 14px; font-weight:900; cursor:pointer;
+      color:#06101f; background: linear-gradient(135deg, var(--brand1), var(--brand2));
+    }
     button.secondary{color: var(--text); background: rgba(255,255,255,.06); border:1px solid var(--line);}
-    .sectionTitle{margin:14px 0 10px; padding-top:14px; border-top:1px solid var(--line); color: rgba(233,238,251,.9); font-weight:900; font-size:13px; letter-spacing:.2px; text-transform:uppercase;}
+    .sectionTitle{margin:14px 0 10px; padding-top:14px; border-top:1px solid var(--line); font-weight:900; font-size:13px; text-transform:uppercase; color:rgba(233,238,251,.9);}
     .emojiGrid{display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px;}
     @media (max-width: 520px){ .emojiGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .emojiOpt{display:flex; gap:10px; align-items:flex-start; padding:10px 10px; border-radius:14px; border:1px solid var(--line); background: rgba(255,255,255,.03); cursor:pointer; user-select:none;}
+    .emojiOpt{display:flex; gap:10px; align-items:flex-start; padding:10px 10px; border-radius:14px; border:1px solid var(--line); background: rgba(255,255,255,.03); cursor:pointer;}
     .emojiOpt input{ margin-top:3px; accent-color:#34d399; }
     .emojiBig{ font-size:20px; line-height:1; width:28px; }
-    .emojiMeta{ display:flex; flex-direction:column; gap:2px; }
-    .emojiName{ font-weight:900; font-size:13px; color: rgba(233,238,251,.92); }
-    .emojiHint{ font-size:12px; color: var(--muted); line-height:1.35; }
-    .note{margin-top:10px; color: var(--muted); font-size:12px; line-height:1.45;}
-    .status{display:none; margin-top:12px; padding:10px 12px; border-radius: 12px; border:1px solid var(--line); background: rgba(0,0,0,.22); color: rgba(233,238,251,.85); font-size:13px; line-height:1.45; white-space:pre-wrap;}
-    .status.warn{ border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95); }
-    .status.err{ border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95); }
+    .emojiName{ font-weight:900; font-size:13px; }
+    .emojiHint{ font-size:12px; color: var(--muted); }
+    .status{
+      display:none; margin-top:12px; padding:10px 12px; border-radius: 12px;
+      border:1px solid var(--line); background: rgba(0,0,0,.22);
+      color: rgba(233,238,251,.85); font-size:13px; white-space:pre-wrap;
+    }
     .resultsHeader{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:13px;}
-    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background: rgba(0,0,0,.18); color: rgba(233,238,251,.8); font-size:12px; white-space:nowrap;}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background: rgba(0,0,0,.18); color: rgba(233,238,251,.8); font-size:12px;}
     .results{margin-top:12px; display:grid; gap:10px;}
     .result{border:1px solid var(--line); background: rgba(255,255,255,.03); border-radius: 14px; padding:12px 12px;}
     .result a{color: var(--text); font-weight:900; text-decoration:none;}
-    .result a:hover{ text-decoration:underline; }
     .snippet{margin-top:6px; color:var(--muted); font-size:13px; line-height:1.45;}
     .url{margin-top:8px; font-size:12px; color: rgba(169,179,199,.75); word-break: break-all;}
   </style>
@@ -71,7 +84,7 @@
         <div class="logo">🏳️‍🌈</div>
         <div>
           <div style="font-size:16px;">Recruiting Flags</div>
-          <div style="font-size:12px; color:var(--muted); font-weight:700;">Filtro de emoji aplicado apenas no “nome” (TITLE)</div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700;">Filtro “emoji no nome” via TITLE</div>
         </div>
       </div>
       <div class="pill">MVP · Vercel + Google CSE</div>
@@ -81,13 +94,9 @@
       <div class="card">
         <h1>Emoji só no nome.</h1>
         <p>
-          Aqui a regra é rígida: <b>se o emoji não estiver no TÍTULO do resultado</b>, ele não aparece.
-          Isso elimina os casos em que a bandeira está só na descrição.
+          Regra rígida: o emoji precisa estar no <b>título</b> do resultado (melhor proxy de “nome do perfil” fora do LinkedIn).
+          Se estiver só na descrição, o resultado é removido.
         </p>
-        <div class="mini">
-          <b>Nota:</b> o título é a melhor aproximação “nome do perfil” sem rodar dentro do LinkedIn.
-          Se o Google não colocar o emoji no título, esse perfil pode não aparecer.
-        </div>
       </div>
 
       <div class="card">
@@ -153,15 +162,13 @@
     const countBadge = $("countBadge");
     const emojiGrid = $("emojiGrid");
 
-    function setStatus(msg, type=""){
-      statusEl.className = "status" + (type ? (" " + type) : "");
+    function setStatus(msg){
       statusEl.style.display = "block";
       statusEl.textContent = msg;
     }
     function clearStatus(){
       statusEl.style.display = "none";
       statusEl.textContent = "";
-      statusEl.className = "status";
     }
     function escapeHtml(s){
       return (s||"")
@@ -200,7 +207,7 @@
         <label class="emojiOpt">
           <input type="checkbox" data-emoji-key="${opt.key}" checked />
           <div class="emojiBig">${opt.emoji}</div>
-          <div class="emojiMeta">
+          <div>
             <div class="emojiName">${escapeHtml(opt.label)}</div>
             <div class="emojiHint">${escapeHtml(opt.hint)}</div>
           </div>
@@ -219,16 +226,23 @@
       `).join("");
     }
 
+    async function safeReadJson(res){
+      const text = await res.text();
+      try { return { ok:true, data: JSON.parse(text) }; }
+      catch { return { ok:false, text }; }
+    }
+
     async function callSearch({ test=false } = {}){
       const role = $("qRole").value.trim();
       const location = $("qLocation").value.trim();
       const name = $("qName").value.trim();
       const extra = $("qExtra").value.trim();
+
       const selected = getSelectedEmojis();
       const expanded = expandSelectedEmojis(selected);
 
       if (!test && !(role || location || name || extra)) {
-        setStatus("Preencha pelo menos um campo para buscar.", "warn");
+        setStatus("Preencha pelo menos um campo para buscar.");
         return;
       }
 
@@ -241,45 +255,47 @@
         ? { role: "Creative Director", location: "São Paulo", name: "Clarissa Astigarraga", extra: "", emojis: selected }
         : { role, location, name, extra, emojis: selected };
 
-      try{
-        const res = await fetch("/api/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+      const res = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-        const data = await res.json();
+      const parsed = await safeReadJson(res);
 
-        if (!res.ok){
-          setStatus("Erro do endpoint (" + res.status + "):\n\n" + (data?.error || "Erro desconhecido"), "err");
-          renderResults([]);
-          countBadge.textContent = "0";
-          return;
-        }
-
-        let items = data.items || [];
-
-        // STRICT: only keep if emoji appears in TITLE
-        if (expanded.length) {
-          items = items.filter(it => titleHasAnyEmoji(it.title, expanded));
-        }
-
-        setStatus(
-          `✅ OK\nRecebidos: ${(data.items||[]).length}\nApós filtro no TITLE: ${items.length}\nEmojis: ${expanded.length ? expanded.join(" ") : "(nenhum — sem filtro)"}`
-        );
-
-        renderResults(items);
-
-        if (!items.length){
-          setStatus(
-            "Nenhum resultado após filtro no TITLE.\n\nIsso significa que o Google não colocou o emoji no título dos perfis retornados.\nTente:\n- selecionar só 1 emoji\n- buscar mais amplo (sem nome)\n- ou desmarcar emojis para validar a busca base",
-            "warn"
-          );
-        }
-      }catch(e){
-        setStatus("Erro ao chamar /api/search:\n\n" + (e?.message || e), "err");
+      if (!parsed.ok) {
+        // Aqui mostramos o HTML/texto REAL que veio do servidor (pra diagnosticar)
+        setStatus("Erro: servidor não retornou JSON.\n\nTrecho do retorno:\n" + parsed.text.slice(0, 300));
         renderResults([]);
         countBadge.textContent = "0";
+        return;
+      }
+
+      const data = parsed.data;
+
+      if (!res.ok) {
+        setStatus("Erro do endpoint (" + res.status + "):\n\n" + (data?.error || "Erro desconhecido"));
+        renderResults([]);
+        countBadge.textContent = "0";
+        return;
+      }
+
+      let items = data.items || [];
+
+      if (expanded.length) {
+        items = items.filter(it => titleHasAnyEmoji(it.title, expanded));
+      }
+
+      setStatus(
+        `✅ OK\nRecebidos: ${(data.items||[]).length}\nApós filtro no TITLE: ${items.length}\n\nDebugQuery:\n${data.debugQuery || "(sem debugQuery)"}`
+      );
+
+      renderResults(items);
+
+      if (!items.length) {
+        setStatus(
+          `Nenhum resultado após filtro no TITLE.\n\nDebugQuery:\n${data.debugQuery || ""}\n\nIsso significa: o Google não colocou o emoji no título dos resultados retornados.`
+        );
       }
     }
 
@@ -298,7 +314,7 @@
         const cb = document.querySelector(`input[data-emoji-key="${opt.key}"]`);
         if (cb) cb.checked = true;
       });
-      setStatus("Todos os emojis selecionados.", "warn");
+      setStatus("Todos os emojis selecionados.");
     });
 
     $("btnSelectNone").addEventListener("click", () => {
@@ -306,11 +322,7 @@
         const cb = document.querySelector(`input[data-emoji-key="${opt.key}"]`);
         if (cb) cb.checked = false;
       });
-      setStatus("Seleção limpa. (Sem emojis = sem filtro)", "warn");
-    });
-
-    ["qRole","qLocation","qName","qExtra"].forEach(id=>{
-      $(id).addEventListener("keydown", (e)=>{ if(e.key==="Enter") callSearch({test:false}); });
+      setStatus("Seleção limpa. (Sem emojis = sem filtro)");
     });
   </script>
 </body>
